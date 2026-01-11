@@ -1,6 +1,6 @@
 # Dağıtık Hata Toleranslı Mesaj Kayıt Sistemi
 
-**Proje Adı**: HaToKuSe (Hata-Tolere Kuyruk Servisi)  
+**Proje Adı**: Dağıtık Abonelik Sistemi 
 **Teknolojiler**: Java 11, gRPC, Protobuf, Maven  
 **Tarih**: Ocak 2026
 
