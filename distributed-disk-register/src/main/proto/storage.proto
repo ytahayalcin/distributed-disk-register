@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option java_package = "com.hatokuse";
+option java_outer_classname = "StorageProto";
+
+message StoredMessage {
+  int32 id = 1;
+  string text = 2;
+}
+
+message StoreRequest {
+  StoredMessage message = 1;
+}
+
+message StoreResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RetrieveRequest {
+  int32 id = 1;
+}
+
+message RetrieveResponse {
+  bool found = 1;
+  StoredMessage message = 2;
+}
+
+service StorageService {
+  rpc Store(StoreRequest) returns (StoreResponse);
+  rpc Retrieve(RetrieveRequest) returns (RetrieveResponse);
+}
