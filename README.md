@@ -1,9 +1,9 @@
 # Dağıtık Hata Toleranslı Mesaj Kayıt Sistemi
 
-**Proje Adı**: Dağıtık Abonelik Sistemi 
+**Proje Adı**: Dağıtık Mesaj Kayıt Sistemi 
 **Teknolojiler**: Java 11, gRPC, Protobuf, Maven  
 **Tarih**: Ocak 2026
-
+YOUTUBE VİDEOSU : https://youtu.be/FHUD6datpmE
 ---
 
 ## 1. ÖZET
