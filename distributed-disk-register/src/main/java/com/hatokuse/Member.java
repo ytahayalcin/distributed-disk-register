@@ -4,19 +4,21 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import java.io.*;
-import java.nio.file.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Member {
     private final int port;
-    private final String storageDir;
+    private final StorageManager storage;
     private Server server;
     private AtomicInteger messageCount = new AtomicInteger(0);
 
     public Member(int port) {
+        this(port, IOMode.BUFFERED);
+    }
+
+    public Member(int port, IOMode ioMode) {
         this.port = port;
-        this.storageDir = "messages_" + port;
-        new File(storageDir).mkdirs();
+        this.storage = new StorageManager("messages_" + port, ioMode);
     }
 
     public void start() throws IOException {
@@ -25,7 +27,7 @@ public class Member {
                 .build()
                 .start();
 
-        System.out.println("Üye " + port + " portu dinliyor");
+        System.out.println("Üye " + port + " portu dinliyor (IO Mode: " + storage.getMode() + ")");
 
         new Thread(() -> {
             while (true) {
@@ -50,12 +52,8 @@ public class Member {
         public void store(StorageProto.StoreRequest req, StreamObserver<StorageProto.StoreResponse> resp) {
             try {
                 StorageProto.StoredMessage msg = req.getMessage();
-                String filePath = storageDir + "/" + msg.getId() + ".msg";
 
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                    writer.write(msg.getText());
-                }
-
+                storage.write(msg.getId(), msg.getText());
                 messageCount.incrementAndGet();
 
                 resp.onNext(StorageProto.StoreResponse.newBuilder()
@@ -75,18 +73,15 @@ public class Member {
         @Override
         public void retrieve(StorageProto.RetrieveRequest req, StreamObserver<StorageProto.RetrieveResponse> resp) {
             try {
-                String filePath = storageDir + "/" + req.getId() + ".msg";
-                File file = new File(filePath);
+                String content = storage.read(req.getId());
 
-                if (!file.exists()) {
+                if (content == null) {
                     resp.onNext(StorageProto.RetrieveResponse.newBuilder()
                             .setFound(false)
                             .build());
                     resp.onCompleted();
                     return;
                 }
-
-                String content = new String(Files.readAllBytes(Paths.get(filePath)));
 
                 resp.onNext(StorageProto.RetrieveResponse.newBuilder()
                         .setFound(true)
@@ -107,12 +102,23 @@ public class Member {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
-            System.out.println("Kullanım: java Member <port>");
+            System.out.println("Kullanım: java Member <port> [IO_MODE]");
+            System.out.println("IO_MODE: BUFFERED, UNBUFFERED, ZERO_COPY (varsayılan: BUFFERED)");
             return;
         }
 
         int port = Integer.parseInt(args[0]);
-        Member member = new Member(port);
+        IOMode ioMode = IOMode.BUFFERED;
+
+        if (args.length > 1) {
+            try {
+                ioMode = IOMode.valueOf(args[1].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Geçersiz IO mode, BUFFERED kullanılıyor");
+            }
+        }
+
+        Member member = new Member(port, ioMode);
         member.start();
         member.blockUntilShutdown();
     }

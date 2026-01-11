@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Leader {
     private final int clientPort;
-    private final String storageDir = "messages_leader";
+    private final StorageManager storage;
     private final Map<Integer, String> localMessages = new ConcurrentHashMap<>();
     private final Map<Integer, List<Integer>> messageToMembers = new ConcurrentHashMap<>();
     private final List<Integer> memberPorts = new ArrayList<>();
@@ -18,14 +18,18 @@ public class Leader {
     private int roundRobinIndex = 0;
 
     public Leader(int clientPort) {
+        this(clientPort, IOMode.BUFFERED);
+    }
+
+    public Leader(int clientPort, IOMode ioMode) {
         this.clientPort = clientPort;
-        new File(storageDir).mkdirs();
+        this.storage = new StorageManager("messages_leader", ioMode);
         loadTolerance();
         System.out.println("Tolerance: " + tolerance);
+        System.out.println("Leader IO Mode: " + storage.getMode());
     }
 
     private void loadTolerance() {
-        // Farklı konumları dene
         String[] paths = {
                 "tolerance.conf",
                 "../tolerance.conf",
@@ -104,10 +108,7 @@ public class Leader {
 
     private void handleSet(int id, String message, PrintWriter out) {
         try {
-            String filePath = storageDir + "/" + id + ".msg";
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                writer.write(message);
-            }
+            storage.write(id, message);
             localMessages.put(id, message);
 
             List<Integer> selectedMembers = selectMembers();
@@ -212,7 +213,6 @@ public class Leader {
             System.out.println("Üye " + port + ": " + count + " mesaj");
         }
 
-        // Mesaj 4501'in yerini göster
         List<Integer> msg4501 = messageToMembers.get(4501);
         if (msg4501 != null) {
             System.out.println("\n>> Mesaj 4501 şu üyelerde: " + msg4501);
@@ -220,7 +220,17 @@ public class Leader {
     }
 
     public static void main(String[] args) throws Exception {
-        Leader leader = new Leader(8080);
+        IOMode ioMode = IOMode.BUFFERED;
+
+        if (args.length > 0) {
+            try {
+                ioMode = IOMode.valueOf(args[0].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Geçersiz IO mode, BUFFERED kullanılıyor");
+            }
+        }
+
+        Leader leader = new Leader(8080, ioMode);
         leader.addMember(9001);
         leader.addMember(9002);
         leader.addMember(9003);

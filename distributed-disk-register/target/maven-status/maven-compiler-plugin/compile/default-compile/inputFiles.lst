@@ -1,7 +1,12 @@
+C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\BulkTest.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\Command.java
+C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\IOMode.java
+C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\IOPerformanceTest.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\Leader.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\Main.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\Member.java
+C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\StorageManager.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\StorageServiceImpl.java
+C:\Users\ytaha\distributed-disk-register\distributed-disk-register\src\main\java\com\hatokuse\TestClient.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\grpc-java\com\hatokuse\StorageServiceGrpc.java
 C:\Users\ytaha\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\com\hatokuse\StorageProto.java
